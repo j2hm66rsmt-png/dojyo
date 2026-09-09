@@ -362,17 +362,60 @@ input[type=checkbox]:checked:after{
 }
 
 @media print{
-  @page{size:A4 portrait;margin:0}
-  body{background:#fff}
-  .toolbar{display:none}
-  .viewport{padding:0;overflow:visible}
-  .scale-holder{width:auto;margin:0}
+  @page{
+    size:A4 portrait;
+    margin:0;
+  }
+
+  html,body{
+    width:210mm !important;
+    height:297mm !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    background:#fff !important;
+  }
+
+  .toolbar{
+    display:none !important;
+  }
+
+  .viewport{
+    width:210mm !important;
+    height:297mm !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    display:block !important;
+  }
+
+  .scale-holder{
+    width:210mm !important;
+    height:297mm !important;
+    margin:0 !important;
+    padding:0 !important;
+    position:relative !important;
+    overflow:hidden !important;
+  }
+
   .paper{
-    width:210mm;
-    min-height:297mm;
-    box-shadow:none;
-    padding:12mm 17mm 10mm;
-    transform:none!important;
+    position:absolute !important;
+    top:0 !important;
+    left:50% !important;
+    width:760px !important;
+    min-height:1075px !important;
+    margin:0 !important;
+    padding:34px 64px 40px !important;
+    box-shadow:none !important;
+    transform-origin:top center !important;
+    /* A4 1ページ内に確実に収まる倍率 */
+    transform:translateX(-50%) scale(0.94) !important;
+    -webkit-transform:translateX(-50%) scale(0.94) !important;
+  }
+
+  .comment-box{
+    break-inside:avoid !important;
+    page-break-inside:avoid !important;
   }
 }
 </style>
@@ -620,7 +663,7 @@ function status(t){
 }
 
 
-const STORAGE_KEY="doujou_v27";
+const STORAGE_KEY="doujou_v28";
 
 
 function autoEvaluate(){
@@ -699,7 +742,13 @@ bindTap("newBtn",()=>{
 
 bindTap("printBtn",()=>{
   status("PDF保存画面を開きます");
-  setTimeout(()=>window.print(),80);
+  document.body.classList.add("printing");
+  setTimeout(()=>window.print(),120);
+});
+
+window.addEventListener("afterprint",()=>{
+  document.body.classList.remove("printing");
+  setTimeout(fitPaper,100);
 });
 
 document.querySelectorAll("input,textarea,select").forEach(el=>{
