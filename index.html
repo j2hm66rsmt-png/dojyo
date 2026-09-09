@@ -292,6 +292,20 @@ input[type=checkbox]:checked:after{
     padding-top:38px;
   }
 }
+
+@media(max-width:1200px){
+  input,
+  textarea,
+  select,
+  .field,
+  .date-field,
+  .eval input,
+  .eval select,
+  .comment-box textarea{
+    font-size:16px !important;
+  }
+}
+
 @media print{
   @page{size:A4 portrait;margin:0}
   body{background:#fff}
@@ -593,37 +607,14 @@ function fitPaper(){
   const viewport = document.getElementById("viewport");
   const toolbar = document.querySelector(".toolbar");
 
-  // ChatGPT内のファイルプレビューなどでは window.innerWidth が
-  // 実際のiPhone表示幅より大きく報告されることがあるため、
-  // visualViewport / screen.width も使って「実際に見える幅」を求める。
-  const candidatesW = [
-    window.innerWidth,
-    document.documentElement.clientWidth,
-    window.visualViewport ? window.visualViewport.width : Infinity,
-    window.screen ? window.screen.width : Infinity
-  ].filter(v => Number.isFinite(v) && v > 0);
-
-  const candidatesH = [
-    window.innerHeight,
-    document.documentElement.clientHeight,
-    window.visualViewport ? window.visualViewport.height : Infinity,
-    window.screen ? window.screen.height : Infinity
-  ].filter(v => Number.isFinite(v) && v > 0);
-
-  const visibleW = Math.min(...candidatesW);
-  const visibleH = Math.min(...candidatesH);
-
-  const isMobile = Math.min(
+  const visibleW = Math.min(
     window.innerWidth || Infinity,
     document.documentElement.clientWidth || Infinity,
-    window.visualViewport ? window.visualViewport.width : Infinity,
     window.screen ? window.screen.width : Infinity
-  ) <= 1200;
+  );
 
-  const toolbarVisible = toolbar && getComputedStyle(toolbar).display !== "none";
-  const toolbarH = toolbarVisible ? toolbar.getBoundingClientRect().height : 0;
+  const isMobile = visibleW <= 1200;
 
-  // 紙をいったん原寸に戻して実寸を計測
   paper.style.transform = "none";
   paper.style.position = "static";
   holder.style.width = "760px";
@@ -633,34 +624,39 @@ function fitPaper(){
     const paperW = 760;
     const paperH = paper.offsetHeight;
 
-    // 画面のほぼ全幅・全高を使用
-    const availableW = Math.max(1, visibleW - 6);
-    const availableH = Math.max(1, visibleH - toolbarH - 12);
+    if(isMobile){
+      // スマホは横幅だけに合わせる。
+      // キーボード表示で画面の高さが変わっても縮小しない。
+      const availableW = Math.max(1, visibleW - 6);
+      const scale = Math.min((availableW / paperW) * 0.985, 1);
 
-    const scale = Math.min(
-      availableW / paperW,
-      availableH / paperH,
-      1
-    );
+      viewport.style.width = "100%";
+      viewport.style.height = "auto";
+      viewport.style.minHeight = "0";
 
-    viewport.style.width = visibleW + "px";
-    viewport.style.minHeight = Math.max(1, visibleH - toolbarH) + "px";
-    viewport.style.height = "auto";
+      holder.style.width = (paperW * scale) + "px";
+      holder.style.height = (paperH * scale) + "px";
+      holder.style.position = "relative";
 
-    holder.style.width = (paperW * scale) + "px";
-    holder.style.height = (paperH * scale) + "px";
-    holder.style.position = "relative";
-
-    paper.style.position = "absolute";
-    paper.style.left = "0";
-    paper.style.top = "0";
-    paper.style.transformOrigin = "top left";
-    paper.style.transform = `scale(${scale})`;
-
-    // スクロール位置はユーザー操作を優先
+      paper.style.position = "absolute";
+      paper.style.left = "0";
+      paper.style.top = "0";
+      paper.style.transformOrigin = "top left";
+      paper.style.transform = `scale(${scale})`;
+    }else{
+      holder.style.width = "760px";
+      holder.style.height = "auto";
+      holder.style.position = "static";
+      paper.style.position = "static";
+      paper.style.transform = "none";
+    }
   });
 }
-window.addEventListener("resize",()=>setTimeout(fitPaper,50));
+window.addEventListener("resize",()=>{
+  const a=document.activeElement;
+  const editing=a && (a.tagName==="INPUT" || a.tagName==="TEXTAREA" || a.tagName==="SELECT");
+  if(!editing) setTimeout(fitPaper,50);
+});
 window.addEventListener("orientationchange",()=>setTimeout(fitPaper,200));
 window.addEventListener("load",()=>{
   fitPaper();
@@ -668,9 +664,7 @@ window.addEventListener("load",()=>{
   setTimeout(fitPaper,500);
 });
 window.addEventListener("pageshow",()=>setTimeout(fitPaper,100));
-if(window.visualViewport){
-  window.visualViewport.addEventListener("resize",()=>setTimeout(fitPaper,50));
-}
+
 </script>
 </body>
 </html>
