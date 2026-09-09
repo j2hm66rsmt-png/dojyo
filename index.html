@@ -41,6 +41,7 @@ body{
 }
 .toolbar .main{background:#fff;color:#111}
 .toolbar .sub{background:#555;color:#fff}
+.toolbar .judge{background:#d9d9d9;color:#111;font-weight:700}
 #status{color:#fff;font-size:12px;margin-left:4px}
 
 .viewport{
@@ -77,14 +78,14 @@ table{border-collapse:collapse;table-layout:fixed;width:100%}
   font-size:11px;
 }
 .info td{
-  height:41px;
+  height:48px;
   border-right:1px solid var(--line);
   padding:3px 5px;
   vertical-align:top;
 }
 .info td:last-child{border-right:0}
-.info .date{width:164px}
-.info .driver{width:246px}
+.info .date{width:260px}
+.info .driver{width:200px}
 .info .checker{width:auto}
 .lab{display:block;line-height:1.05}
 .date-line{
@@ -96,6 +97,46 @@ table{border-collapse:collapse;table-layout:fixed;width:100%}
   width:100%;padding:1px 2px;font-size:12px
 }
 .date-field{width:115px}
+
+.native-date-row{
+  display:flex;
+  align-items:center;
+  gap:2px;
+  margin-top:4px;
+  white-space:nowrap;
+  overflow:visible;
+}
+.native-date-select{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  border:1px solid #999 !important;
+  border-radius:4px;
+  background:#fff !important;
+  color:#111 !important;
+  -webkit-text-fill-color:#111 !important;
+  font-size:16px !important;
+  line-height:28px;
+  height:32px;
+  padding:0 4px !important;
+  appearance:auto !important;
+  -webkit-appearance:menulist !important;
+}
+.native-date-select option{
+  color:#111 !important;
+  background:#fff !important;
+  font-size:16px !important;
+}
+.era-native{width:74px}
+.year-native{width:58px}
+.md-native{width:52px}
+.native-date-row span{
+  font-size:11px;
+  color:#111;
+  flex:0 0 auto;
+}
+
+
 .main-table{
   border:2px solid var(--line);
   font-size:10px;
@@ -196,22 +237,26 @@ input[type=checkbox]:checked:after{
   display:flex;align-items:center;justify-content:center;
   font-weight:700;font-size:10px
 }
-.eval input,
-.eval select{
+.eval input{
   border:0;
   outline:0;
   width:100%;
   height:100%;
-  padding:4px 24px 4px 8px;
+  padding:4px 8px;
   font-size:14px;
   background:#fff;
   color:#111;
 }
-.evaluation-select{
-  appearance:auto;
-  -webkit-appearance:menulist;
-  text-align:center;
-  text-align-last:center;
+.evaluation-display{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+  font-weight:500;
+  background:#fff;
+  color:#111;
 }
 .comment-area{padding-left:0}
 .comment-title{
@@ -300,7 +345,6 @@ input[type=checkbox]:checked:after{
   .field,
   .date-field,
   .eval input,
-  .eval select,
   .comment-box textarea{
     font-size:16px !important;
   }
@@ -326,7 +370,8 @@ input[type=checkbox]:checked:after{
 <div class="toolbar">
   <button type="button" class="main" id="saveBtn">保存</button>
   <button type="button" class="sub" id="newBtn">新規入力</button>
-  <button type="button" class="sub" id="printBtn">印刷 / PDF保存</button>
+  <button type="button" class="sub" id="printBtn">PDF保存</button>
+  <button type="button" class="judge" id="judgeBtn">判定</button>
   <span id="status"></span>
 </div>
 
@@ -339,9 +384,14 @@ input[type=checkbox]:checked:after{
         <tr>
           <td class="date">
             <span class="lab">実施日</span>
-            <div class="date-line">
-              <span>令和</span>
-              <input id="date" class="field date-field" type="text" placeholder="　年　　月　　日">
+            <div class="date-line native-date-row">
+              <select id="era" class="native-date-select era-native"><option value="令和">令和</option><option value="平成">平成</option><option value="昭和">昭和</option></select>
+              <select id="warekiYear" class="native-date-select year-native"><option value=""></option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="39">39</option><option value="40">40</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option><option value="49">49</option><option value="50">50</option><option value="51">51</option><option value="52">52</option><option value="53">53</option><option value="54">54</option><option value="55">55</option><option value="56">56</option><option value="57">57</option><option value="58">58</option><option value="59">59</option><option value="60">60</option><option value="61">61</option><option value="62">62</option><option value="63">63</option><option value="64">64</option><option value="65">65</option><option value="66">66</option><option value="67">67</option><option value="68">68</option><option value="69">69</option><option value="70">70</option><option value="71">71</option><option value="72">72</option><option value="73">73</option><option value="74">74</option><option value="75">75</option><option value="76">76</option><option value="77">77</option><option value="78">78</option><option value="79">79</option><option value="80">80</option><option value="81">81</option><option value="82">82</option><option value="83">83</option><option value="84">84</option><option value="85">85</option><option value="86">86</option><option value="87">87</option><option value="88">88</option><option value="89">89</option><option value="90">90</option><option value="91">91</option><option value="92">92</option><option value="93">93</option><option value="94">94</option><option value="95">95</option><option value="96">96</option><option value="97">97</option><option value="98">98</option><option value="99">99</option></select>
+              <span>年</span>
+              <select id="month" class="native-date-select md-native"><option value=""></option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select>
+              <span>月</span>
+              <select id="day" class="native-date-select md-native"><option value=""></option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option></select>
+              <span>日</span>
             </div>
           </td>
           <td class="driver">
@@ -524,14 +574,7 @@ input[type=checkbox]:checked:after{
       <div class="bottom">
         <div class="eval">
           <div class="elab">評価</div>
-          <select id="evaluation" class="evaluation-select">
-  <option value=""></option>
-  <option value="A">A</option>
-  <option value="B">B</option>
-  <option value="C">C</option>
-  <option value="D">D</option>
-  <option value="E">E</option>
-</select>
+          <div id="evaluation" class="evaluation-display"></div>
         </div>
         <div class="comment-area">
           <div class="comment-title">担当者からのコメント</div>
@@ -544,12 +587,14 @@ input[type=checkbox]:checked:after{
   </div>
 </div>
 
+
 <script>
-const ids=["date","driver","checker","evaluation","comment"];
+const ids=["era","warekiYear","month","day","driver","checker","comment"];
 
 function collect(){
   const d={};
   ids.forEach(id=>d[id]=document.getElementById(id).value);
+  d.evaluation=document.getElementById("evaluation").textContent;
   document.querySelectorAll("[data-key]").forEach(x=>d[x.dataset.key]=x.checked);
   return d;
 }
@@ -562,7 +607,40 @@ function status(t){
   s.textContent=t;
   setTimeout(()=>{if(s.textContent===t)s.textContent=""},1600);
 }
-const STORAGE_KEY="doujou_v13";
+
+
+const STORAGE_KEY="doujou_v25";
+
+
+function autoEvaluate(){
+  const phenomenonChecks = [...document.querySelectorAll('input[type="checkbox"][data-key^="c"]')];
+  const dangerChecks = [...document.querySelectorAll('input[type="checkbox"][data-key^="d"]')];
+
+  const phenomenonCount = phenomenonChecks.filter(cb => cb.checked).length;
+  const dangerCount = dangerChecks.filter(cb => cb.checked).length;
+
+  let grade = "E";
+
+  // Aから順に判定し、最初に当てはまった＝最も高い評価を採用
+  if(dangerCount === 0 && phenomenonCount <= 2){
+    grade = "A";
+  }else if(dangerCount === 0 && phenomenonCount <= 4){
+    grade = "B";
+  }else if(dangerCount <= 1 && phenomenonCount <= 7){
+    grade = "C";
+  }else if(dangerCount <= 2 && phenomenonCount <= 10){
+    grade = "D";
+  }else{
+    grade = "E";
+  }
+
+  const evaluation = document.getElementById("evaluation");
+  if(evaluation.textContent !== grade){
+    evaluation.textContent = grade;
+    evaluation.setAttribute("data-grade", grade);
+  }
+  return grade;
+}
 
 function safeSave(){
   try{
@@ -574,6 +652,14 @@ function safeSave(){
   }
 }
 
+document.getElementById("judgeBtn").addEventListener("click",()=>{
+  const grade=autoEvaluate();
+  status("判定：" + grade);
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(collect()));
+  }catch(e){}
+});
+
 document.getElementById("saveBtn").addEventListener("click",safeSave);
 
 document.getElementById("newBtn").addEventListener("click",()=>{
@@ -581,11 +667,13 @@ document.getElementById("newBtn").addEventListener("click",()=>{
   if(!ok)return;
   try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
   apply({});
+  setTodayWarekiIfEmpty();
+  document.getElementById("evaluation").textContent="";
   status("新規入力");
 });
 
 document.getElementById("printBtn").addEventListener("click",()=>{
-  status("印刷を開きます");
+  status("PDF保存画面を開きます");
   setTimeout(()=>window.print(),50);
 });
 
@@ -594,63 +682,6 @@ document.querySelectorAll("input,textarea,select").forEach(el=>{
     try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(collect())); }catch(e){}
   });
 });
-
-try{
-  const saved=localStorage.getItem(STORAGE_KEY);
-  if(saved){apply(JSON.parse(saved));}
-}catch(e){}
-
-/* iPhoneなどでは、紙全体を画面幅に収める */
-function fitPaper(){
-  const paper = document.getElementById("paper");
-  const holder = document.getElementById("holder");
-  const viewport = document.getElementById("viewport");
-  const toolbar = document.querySelector(".toolbar");
-
-  const visibleW = Math.min(
-    window.innerWidth || Infinity,
-    document.documentElement.clientWidth || Infinity,
-    window.screen ? window.screen.width : Infinity
-  );
-
-  const isMobile = visibleW <= 1200;
-
-  paper.style.transform = "none";
-  paper.style.position = "static";
-  holder.style.width = "760px";
-  holder.style.height = "auto";
-
-  requestAnimationFrame(() => {
-    const paperW = 760;
-    const paperH = paper.offsetHeight;
-
-    if(isMobile){
-      // スマホは横幅だけに合わせる。
-      // キーボード表示で画面の高さが変わっても縮小しない。
-      const availableW = Math.max(1, visibleW - 6);
-      const scale = Math.min((availableW / paperW) * 0.985, 1);
-
-      viewport.style.width = "100%";
-      viewport.style.height = "auto";
-      viewport.style.minHeight = "0";
-
-      holder.style.width = (paperW * scale) + "px";
-      holder.style.height = (paperH * scale) + "px";
-      holder.style.position = "relative";
-
-      paper.style.position = "absolute";
-      paper.style.left = "0";
-      paper.style.top = "0";
-      paper.style.transformOrigin = "top left";
-      paper.style.transform = `scale(${scale})`;
-    }else{
-      holder.style.width = "760px";
-      holder.style.height = "auto";
-      holder.style.position = "static";
-      paper.style.position = "static";
-      paper.style.transform = "none";
-    }
-  });
 }
 window.addEventListener("resize",()=>{
   const a=document.activeElement;
