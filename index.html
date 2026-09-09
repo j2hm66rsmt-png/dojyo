@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>同乗チェックシート</title>
+<style>
+:root{
+  --line:#222;
+  --paper:#fff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#efefef;color:#111}
+body{
+  font-family:"Yu Gothic","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+}
+.toolbar{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:9999;
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  align-items:center;
+  background:#222;
+  padding:8px 10px;
+  pointer-events:auto;
+  touch-action:manipulation;
+}
+.toolbar button{
+  border:0;
+  border-radius:6px;
+  padding:8px 13px;
+  font-size:14px;
+  cursor:pointer;
+  pointer-events:auto;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:rgba(255,255,255,.18);
+}
+.toolbar .main{background:#fff;color:#111}
+.toolbar .sub{background:#555;color:#fff}
+#status{color:#fff;font-size:12px;margin-left:4px}
+
+.viewport{
+  width:100%;
+  overflow:auto;
+  padding:64px 8px 34px;
+}
+.scale-holder{
+  width:760px;
+  margin:0 auto;
+}
+.paper{
+  width:760px;
+  min-height:1075px;
+  background:var(--paper);
+  box-shadow:0 2px 12px rgba(0,0,0,.18);
+  padding:34px 64px 40px;
+  transform-origin:top left;
+}
+.title{
+  text-align:center;
+  font-size:24px;
+  font-weight:700;
+  text-decoration:underline;
+  text-decoration-thickness:2px;
+  text-underline-offset:3px;
+  margin:0 0 21px;
+  letter-spacing:.03em;
+}
+table{border-collapse:collapse;table-layout:fixed;width:100%}
+.info{
+  border:2px solid var(--line);
+  margin-bottom:19px;
+  font-size:11px;
+}
+.info td{
+  height:41px;
+  border-right:1px solid var(--line);
+  padding:3px 5px;
+  vertical-align:top;
+}
+.info td:last-child{border-right:0}
+.info .date{width:164px}
+.info .driver{width:246px}
+.info .checker{width:auto}
+.lab{display:block;line-height:1.05}
+.date-line{
+  display:flex;gap:8px;align-items:end;margin-top:4px;
+  white-space:nowrap
+}
+.field{
+  border:0;outline:0;background:transparent;
+  width:100%;padding:1px 2px;font-size:12px
+}
+.date-field{width:115px}
+.main-table{
+  border:2px solid var(--line);
+  font-size:10px;
+}
+.main-table td,.main-table th{
+  border:1px solid var(--line);
+  padding:0;
+  vertical-align:middle;
+  height:31px;
+}
+.main-table .diag-head{
+  position:relative;
+  height:63px;
+}
+.main-table .diag-head:after{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom right,
+    transparent 49.4%, var(--line) 49.8%, var(--line) 50.2%, transparent 50.6%);
+  pointer-events:none
+}
+.main-table .headline{
+  text-align:center;font-size:11px;font-weight:700;height:31px
+}
+.main-table .subhead{
+  text-align:center;font-size:10px;font-weight:400;height:31px
+}
+.cat{
+  width:49px;
+  text-align:center;
+  font-weight:700;
+  line-height:1.45;
+}
+.item{
+  width:95px;
+  text-align:center;
+  white-space:normal;
+  line-height:1.25;
+  font-size:10px;
+  padding:1px 2px!important;
+}
+.risk{
+  width:39px;
+  text-align:center;
+}
+.chk{
+  padding-left:5px!important;
+}
+.chk label{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  line-height:1.15;
+  min-height:29px;
+  white-space:normal;
+}
+input[type=checkbox]{
+  appearance:none;-webkit-appearance:none;
+  width:12px;height:12px;border:1px solid #777;background:#fff;
+  margin:0;flex:0 0 auto;position:relative
+}
+input[type=checkbox]:checked:after{
+  content:"✓";position:absolute;left:-1px;top:-5px;
+  font-size:15px;font-weight:700
+}
+.r35 td{height:35px}
+.r38 td{height:38px}
+.r40 td{height:40px}
+.r44 td{height:44px}
+
+.diag-mini{
+  position:relative;
+}
+.diag-mini:after{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom right,
+    transparent 49.2%,var(--line) 49.6%,var(--line) 50.4%,transparent 50.8%);
+  pointer-events:none
+}
+
+.note{
+  font-size:9px;text-align:center;margin:7px 0 17px
+}
+.bottom{
+  display:grid;
+  grid-template-columns:126px 1fr;
+  gap:0;
+}
+.eval{
+  border:2px solid var(--line);
+  height:42px;
+  display:grid;
+  grid-template-columns:52px 1fr;
+}
+.eval .elab{
+  border-right:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:10px
+}
+.eval input,
+.eval select{
+  border:0;
+  outline:0;
+  width:100%;
+  height:100%;
+  padding:4px 24px 4px 8px;
+  font-size:14px;
+  background:#fff;
+  color:#111;
+}
+.evaluation-select{
+  appearance:auto;
+  -webkit-appearance:menulist;
+  text-align:center;
+  text-align-last:center;
+}
+.comment-area{padding-left:0}
+.comment-title{
+  font-size:10px;font-weight:700;
+  padding-left:37px;margin:2px 0 3px
+}
+.comment-box{
+  height:179px;
+  border:1.5px solid #aaa;
+  border-radius:28px;
+  overflow:hidden
+}
+.comment-box textarea{
+  width:100%;height:100%;resize:none;border:0;outline:0;
+  padding:18px 22px;background:transparent;font-size:12px
+}
+
+/* 横幅が狭い端末では紙全体を縮小表示 */
+@media(max-width:1200px){
+  html,body{
+    margin:0;
+    width:100%;
+    min-height:100%;
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .toolbar{
+    display:flex;
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    z-index:9999;
+    height:42px;
+    padding:4px 5px;
+    gap:4px;
+    background:#222;
+    pointer-events:auto;
+  }
+  .toolbar button{
+    padding:6px 8px;
+    font-size:11px;
+    pointer-events:auto;
+    touch-action:manipulation;
+  }
+  #status{
+    display:inline;
+    min-width:54px;
+    font-size:10px;
+  }
+  .viewport{
+    margin:0 auto;
+    padding:42px 0 0;
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+    display:block;
+  }
+  .scale-holder{
+    margin:0;
+    position:relative;
+  }
+  .paper{
+    transform-origin:top left;
+    box-shadow:none;
+  }
+}
+@media(max-width:1200px) and (orientation:portrait){
+  .toolbar{
+    height:38px;
+    padding:3px 4px;
+    gap:3px;
+  }
+  .toolbar button{
+    padding:5px 7px;
+    font-size:10px;
+  }
+  .viewport{
+    padding-top:38px;
+  }
+}
+@media print{
+  @page{size:A4 portrait;margin:0}
+  body{background:#fff}
+  .toolbar{display:none}
+  .viewport{padding:0;overflow:visible}
+  .scale-holder{width:auto;margin:0}
+  .paper{
+    width:210mm;
+    min-height:297mm;
+    box-shadow:none;
+    padding:12mm 17mm 10mm;
+    transform:none!important;
+  }
+}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <button type="button" class="main" id="saveBtn">保存</button>
+  <button type="button" class="sub" id="newBtn">新規入力</button>
+  <button type="button" class="sub" id="printBtn">印刷 / PDF保存</button>
+  <span id="status"></span>
+</div>
+
+<div class="viewport" id="viewport">
+  <div class="scale-holder" id="holder">
+    <div class="paper" id="paper">
+      <div class="title">同乗チェックシート</div>
+
+      <table class="info">
+        <tr>
+          <td class="date">
+            <span class="lab">実施日</span>
+            <div class="date-line">
+              <span>令和</span>
+              <input id="date" class="field date-field" type="text" placeholder="　年　　月　　日">
+            </div>
+          </td>
+          <td class="driver">
+            <span class="lab">ドライバー名</span>
+            <input id="driver" class="field" type="text">
+          </td>
+          <td class="checker">
+            <span class="lab">チェック担当者</span>
+            <input id="checker" class="field" type="text">
+          </td>
+        </tr>
+      </table>
+
+      <table class="main-table">
+        <colgroup>
+          <col style="width:49px">
+          <col style="width:95px">
+          <col style="width:39px">
+          <col style="width:112px">
+          <col style="width:112px">
+          <col style="width:112px">
+          <col style="width:112px">
+        </colgroup>
+
+        <tr>
+          <td class="diag-head" colspan="2" rowspan="2"></td>
+          <th class="headline" colspan="5">チェックポイント（同じ現象が複数回でもチェックは１つ）</th>
+        </tr>
+        <tr>
+          <th class="subhead">危険</th>
+          <th class="subhead" colspan="4">現象</th>
+        </tr>
+
+        <tr class="r35">
+          <td class="cat" rowspan="13">運<br>転<br>行<br>動</td>
+          <td class="item">①発進</td>
+          <td class="risk"><input type="checkbox" data-key="d0"></td>
+          <td class="chk"><label><input type="checkbox" data-key="c0a">姿勢</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c0b">ミラー調整</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c0c">発進合図</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c0d">発進確認</label></td>
+        </tr>
+        <tr class="r35">
+          <td class="item">②アクセル</td>
+          <td class="risk"><input type="checkbox" data-key="d1"></td>
+          <td class="chk"><label><input type="checkbox" data-key="c1a">むら</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c1b">踏みすぎ</label></td>
+          <td></td><td></td>
+        </tr>
+        <tr class="r35">
+          <td class="item">③ブレーキ</td>
+          <td class="risk"><input type="checkbox" data-key="d2"></td>
+          <td class="chk"><label><input type="checkbox" data-key="c2a">急・遅い</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c2b">構え</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c2c">踏みかえ</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c2d">踏む位置</label></td>
+        </tr>
+        <tr class="r35">
+          <td class="item">④ハンドル</td>
+          <td class="risk"><input type="checkbox" data-key="d3"></td>
+          <td class="chk"><label><input type="checkbox" data-key="c3a">内掛け</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c3b">片手</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c3c">保持</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c3d">ふらつき</label></td>
+        </tr>
+
+        <tr class="r38">
+          <td class="item" rowspan="2">⑤速度</td>
+          <td class="risk" rowspan="2"><input type="checkbox" data-key="d4"></td>
+          <td class="chk"><label><input type="checkbox" data-key="c4a">制限速度</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c4b">安全速度(見通し)</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c4c">安全速度(生活路)</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c4d">安全速度(右左折)</label></td>
+        </tr>
+        <tr class="r38">
+          <td class="chk"><label><input type="checkbox" data-key="c4e">安全速度(障害物)</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c4f">安全速度(遅い)</label></td>
+          <td></td><td></td>
+        </tr>
+
+        <tr class="r38">
+          <td class="item">⑥間隔</td>
+          <td class="risk"><input type="checkbox" data-key="d5"></td>
+          <td class="chk"><label><input type="checkbox" data-key="c5a">側方間隔</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c5b">車間距離(走行時)</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c5c">車間距離(停止時)</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c5d">接触・脱輪</label></td>
+        </tr>
+
+        <tr class="r38">
+          <td class="item" rowspan="2">⑦交差点<br>の運行</td>
+          <td class="risk" rowspan="2"><input type="checkbox" data-key="d6"></td>
+          <td class="chk"><label><input type="checkbox" data-key="c6a">左折通行位置</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c6b">右折通行位置</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c6c">合図</label></td>
+          <td></td>
+        </tr>
+        <tr class="r38">
+          <td class="chk"><label><input type="checkbox" data-key="c6d">確認(右左折)</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c6e">確認(見通し)</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c6f">歩行者保護</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c6g">優先妨害</label></td>
+        </tr>
+
+        <tr class="r35">
+          <td class="item">⑧信号</td>
+          <td class="risk"><input type="checkbox" data-key="d7"></td>
+          <td class="chk"><label><input type="checkbox" data-key="c7a">読み不足</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c7b">判断ミス</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c7c">見落とし</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c7d">見切り発進</label></td>
+        </tr>
+
+        <tr class="r35">
+          <td class="item">⑨一時停止</td>
+          <td class="risk"><input type="checkbox" data-key="d8"></td>
+          <td class="chk"><label><input type="checkbox" data-key="c8a">停止線(出すぎ)</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c8b">不停止</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c8c">出方不良</label></td>
+          <td></td>
+        </tr>
+
+        <tr class="r35">
+          <td class="item">⑩進路変更</td>
+          <td class="risk"><input type="checkbox" data-key="d9"></td>
+          <td class="chk"><label><input type="checkbox" data-key="c9a">合図</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c9b">確認</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c9c">急</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c9d">禁止場所</label></td>
+        </tr>
+
+        <tr class="r35">
+          <td class="item">⑪後退</td>
+          <td class="risk"><input type="checkbox" data-key="d10"></td>
+          <td class="chk"><label><input type="checkbox" data-key="c10a">確認</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c10b">誘導</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c10c">速度</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c10d">切り替し</label></td>
+        </tr>
+
+        <tr class="r35">
+          <td class="cat" rowspan="3">接遇面</td>
+          <td class="item">⑫声かけ</td>
+          <td class="risk diag-mini"></td>
+          <td class="chk"><label><input type="checkbox" data-key="c11a">大きさ</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c11b">呼称</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c11c">挨拶</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c11d">案内</label></td>
+        </tr>
+
+        <tr class="r35">
+          <td class="item">⑬表情</td>
+          <td class="risk diag-mini"></td>
+          <td class="chk"><label><input type="checkbox" data-key="c12a">笑顔</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c12b">向き(顔・体)</label></td>
+          <td></td><td></td>
+        </tr>
+
+        <tr class="r35">
+          <td class="item">⑭乗り心地</td>
+          <td class="risk diag-mini"></td>
+          <td class="chk"><label><input type="checkbox" data-key="c13a">揺れ</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c13b">停止時のショック</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c13c">速度感</label></td>
+          <td></td>
+        </tr>
+
+        <tr class="r35">
+          <td class="cat" colspan="2" style="line-height:1.2">精神面・性格面</td>
+          <td class="risk"><input type="checkbox" data-key="d14"></td>
+          <td class="chk"><label><input type="checkbox" data-key="c14a">先急ぎ行動</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c14b">過信傾向</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c14c">パニック傾向</label></td>
+          <td class="chk"><label><input type="checkbox" data-key="c14d">注意力むら</label></td>
+        </tr>
+      </table>
+
+      <div class="note">※特に危険な行動が見られた場合、「危険」欄に注意</div>
+
+      <div class="bottom">
+        <div class="eval">
+          <div class="elab">評価</div>
+          <select id="evaluation" class="evaluation-select">
+  <option value=""></option>
+  <option value="A">A</option>
+  <option value="B">B</option>
+  <option value="C">C</option>
+  <option value="D">D</option>
+  <option value="E">E</option>
+</select>
+        </div>
+        <div class="comment-area">
+          <div class="comment-title">担当者からのコメント</div>
+          <div class="comment-box">
+            <textarea id="comment"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ids=["date","driver","checker","evaluation","comment"];
+
+function collect(){
+  const d={};
+  ids.forEach(id=>d[id]=document.getElementById(id).value);
+  document.querySelectorAll("[data-key]").forEach(x=>d[x.dataset.key]=x.checked);
+  return d;
+}
+function apply(d={}){
+  ids.forEach(id=>document.getElementById(id).value=d[id]||"");
+  document.querySelectorAll("[data-key]").forEach(x=>x.checked=!!d[x.dataset.key]);
+}
+function status(t){
+  const s=document.getElementById("status");
+  s.textContent=t;
+  setTimeout(()=>{if(s.textContent===t)s.textContent=""},1600);
+}
+const STORAGE_KEY="doujou_v13";
+
+function safeSave(){
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(collect()));
+    status("保存しました");
+  }catch(e){
+    status("保存できません");
+    alert("この表示環境ではブラウザ保存が制限されています。SafariまたはChromeで開いてください。");
+  }
+}
+
+document.getElementById("saveBtn").addEventListener("click",safeSave);
+
+document.getElementById("newBtn").addEventListener("click",()=>{
+  const ok=window.confirm("入力内容を消して新規入力にしますか？");
+  if(!ok)return;
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  apply({});
+  status("新規入力");
+});
+
+document.getElementById("printBtn").addEventListener("click",()=>{
+  status("印刷を開きます");
+  setTimeout(()=>window.print(),50);
+});
+
+document.querySelectorAll("input,textarea,select").forEach(el=>{
+  el.addEventListener("change",()=>{
+    try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(collect())); }catch(e){}
+  });
+});
+
+try{
+  const saved=localStorage.getItem(STORAGE_KEY);
+  if(saved){apply(JSON.parse(saved));}
+}catch(e){}
+
+/* iPhoneなどでは、紙全体を画面幅に収める */
+function fitPaper(){
+  const paper = document.getElementById("paper");
+  const holder = document.getElementById("holder");
+  const viewport = document.getElementById("viewport");
+  const toolbar = document.querySelector(".toolbar");
+
+  // ChatGPT内のファイルプレビューなどでは window.innerWidth が
+  // 実際のiPhone表示幅より大きく報告されることがあるため、
+  // visualViewport / screen.width も使って「実際に見える幅」を求める。
+  const candidatesW = [
+    window.innerWidth,
+    document.documentElement.clientWidth,
+    window.visualViewport ? window.visualViewport.width : Infinity,
+    window.screen ? window.screen.width : Infinity
+  ].filter(v => Number.isFinite(v) && v > 0);
+
+  const candidatesH = [
+    window.innerHeight,
+    document.documentElement.clientHeight,
+    window.visualViewport ? window.visualViewport.height : Infinity,
+    window.screen ? window.screen.height : Infinity
+  ].filter(v => Number.isFinite(v) && v > 0);
+
+  const visibleW = Math.min(...candidatesW);
+  const visibleH = Math.min(...candidatesH);
+
+  const isMobile = Math.min(
+    window.innerWidth || Infinity,
+    document.documentElement.clientWidth || Infinity,
+    window.visualViewport ? window.visualViewport.width : Infinity,
+    window.screen ? window.screen.width : Infinity
+  ) <= 1200;
+
+  const toolbarVisible = toolbar && getComputedStyle(toolbar).display !== "none";
+  const toolbarH = toolbarVisible ? toolbar.getBoundingClientRect().height : 0;
+
+  // 紙をいったん原寸に戻して実寸を計測
+  paper.style.transform = "none";
+  paper.style.position = "static";
+  holder.style.width = "760px";
+  holder.style.height = "auto";
+
+  requestAnimationFrame(() => {
+    const paperW = 760;
+    const paperH = paper.offsetHeight;
+
+    // 画面のほぼ全幅・全高を使用
+    const availableW = Math.max(1, visibleW - 6);
+    const availableH = Math.max(1, visibleH - toolbarH - 12);
+
+    const scale = Math.min(
+      availableW / paperW,
+      availableH / paperH,
+      1
+    );
+
+    viewport.style.width = visibleW + "px";
+    viewport.style.minHeight = Math.max(1, visibleH - toolbarH) + "px";
+    viewport.style.height = "auto";
+
+    holder.style.width = (paperW * scale) + "px";
+    holder.style.height = (paperH * scale) + "px";
+    holder.style.position = "relative";
+
+    paper.style.position = "absolute";
+    paper.style.left = "0";
+    paper.style.top = "0";
+    paper.style.transformOrigin = "top left";
+    paper.style.transform = `scale(${scale})`;
+
+    // スクロール位置はユーザー操作を優先
+  });
+}
+window.addEventListener("resize",()=>setTimeout(fitPaper,50));
+window.addEventListener("orientationchange",()=>setTimeout(fitPaper,200));
+window.addEventListener("load",()=>{
+  fitPaper();
+  setTimeout(fitPaper,150);
+  setTimeout(fitPaper,500);
+});
+window.addEventListener("pageshow",()=>setTimeout(fitPaper,100));
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize",()=>setTimeout(fitPaper,50));
+}
+</script>
+</body>
+</html>
